@@ -1,35 +1,74 @@
-const path = require('path');
-const express = require('express');
+/**
+ * ************************************
+ *
+ * @module Server
+ * @author Scratch: Team Photogenicus (Phillip, Sean, Peter, Alex and Brian), Iteration: Team Floppy (Sully, Robleh, Ken, Angela, Lorenzo)
+ * @date 5/25/2021
+ * @description 
+ *
+ * ************************************
+ */
+
+/******************** Importing modules ************************/
+// Importing path and express node modules
+const path = require('path');             // https://nodejs.org/api/path.html
+const express = require('express');       // https://www.npmjs.com/package/express
+
+// Declaring app, assigning app to instance of express to run express methods upon
 const app = express();
+// Declaring port variable for listen use case 
 const PORT = 3000;
+
+//Importing object w/ methods exported from databaseControllers file, giving it label of cookieController  
 const databaseController = require('./controllers/databaseControllers');
-const cookieParser = require('cookie-parser');
+
+//Requiring in dependency cookie-parser to parse cookies in file      
+const cookieParser = require('cookie-parser'); // https://www.npmjs.com/package/cookie-parser
+
+//Importing object w/ methods exported from cookieController file, giving it label of cookieController  
 const cookieController = require('./controllers/cookieController');
 
-app.use(express.urlencoded({ extended: true }));
+/******************** Express Middleware ************************/
 
-app.use(express.static(path.join(__dirname, '../build')));
-app.use(express.static(__dirname + '/public'));
+// app.use without a path specified applies the middleware to all requests
 
+// Parses incoming requests with urlencoded payloads http://expressjs.com/en/api.html#express.urlencoded
+app.use(express.urlencoded({ extended: true })); 
+
+// Built-in express middleware that serves static files from the specified directory
+// The function determines which files to serve by combining the provided root directory with req.url (essentially, the part after "http://localhost:port")
+app.use(express.static(path.resolve(__dirname, '../build')));
+
+//built-in middleware function in Express: parses incoming requests with JSON payloads; places in req.body 
 app.use(express.json());
+
+//Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 app.use(cookieParser());
-//use for rendering ejs templates, ejs must be rendered.
-app.set('view engine', 'ejs');
 
+// Express JavaScript Templates (EJs)
+// Used for rendering Express JavaScript templates, EJs must be rendered.
+app.set('view engine', 'ejs'); // http://expressjs.com/en/api.html#app.set
 
+/******************** Server Route Handlers ************************/
+
+// Handle requests to '/' and render login screen back to client
 app.get('/', (req, res) => {
-  //change return filepath to login screen
-  return res.render('../client/login');
-});
+  return res.render(path.resolve(__dirname, '../client/login'));
+}); 
 
+// TO DO: Create two routers, homepageRouter and signupRouter to handle any requests to /homepage and /signup to their respective routers.
+
+// Handle requests to '/homepage/itinerary' and render index? to page; specify endpoint; appending to add ejs 
 app.post('/homepage/itinerary', databaseController.addItinerary, (req, res) => {
-  console.log('We ARE HERE!')
-  return res.status(200).render('../index');
-})
+  console.log('INSIDE HOMEPAGE/ITINERARY');
+  console.log(path.resolve(__dirname, '../index.ejs'));
+  return res.status(200).render(path.resolve(__dirname, '../index.ejs'));
+});
 
 app.get('/homepage/getItinerary', databaseController.getItinerary, (req, res) => {
   return res.status(200).json(res.locals.itinerary);
 });
+
 //when user (get) requests signup page, then render signup page
 app.get('/signup', (req, res) => {
   res.render('./../client/signup', {error: null});

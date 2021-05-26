@@ -70,6 +70,9 @@ databaseController.getAccountID = (req, res, next) => {
 };
 
 databaseController.getItinerary = (req, res, next) => {
+
+  // This doesn't work: 'databaseController.addAccount : ERROR: error: insert or update on table "itinerary" violates foreign key constraint "hotel_fk"'
+
   const accountID = [req.cookies.accountID]; //Account ID is obtained from a cookie.
   // const accountID = [res.locals.accountID];
   // let queryString = 'SELECT i.*, c.name AS country_name, c.currency_code AS currency_code, f.name AS flight_name, f.price AS flight_price, h.name AS hotel_name, h.price AS hotel_price, y.name AS activity_name, y.price AS activity_price FROM itinerary i LEFT OUTER JOIN country c on i.country_id = c._id LEFT OUTER JOIN flight f on i.flight_id = f._id LEFT OUTER JOIN hotel h on i.hotel_id = h._id LEFT OUTER JOIN itinerary_activity x on i._id = x.itinerary_id LEFT OUTER JOIN activity y ON x.activity_id = y._id WHERE account_id = $1;' 
