@@ -4,25 +4,31 @@ const path = require('path');
 const express = require('express');
 const app = express();
 
-//Import bcrypt into file
+// Import bcrypt module, and set salt rounds to 10
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
 const databaseController = {};
 
-app.set('view engine', 'ejs');
+// Express JavaScript Templates (EJs)
+// Used for rendering Express JavaScript templates, EJs must be rendered.
+app.set('view engine', 'ejs'); // http://expressjs.com/en/api.html#app.set
 // app.use(express.urlencoded());
 
+// Bcrypt user password, store encrypted password to be passed to next middleware
 databaseController.bcrypt = (req, res, next) => {
   const { password } = req.body;
   //Use the Bcrypt function to hash the password with provided amount of salt rounds
   bcrypt.hash(password, saltRounds, function (err, hash) {
+    // if error, go to global error handler
     if (err) {
-      return res.status(400).send("Error: Unable to store password.");
+      return next({
+        log: `databaseController.bcrypt: ERROR ${err}`,
+        message: 'Error occurred in databaseController.bcrypt. Check server log for more details',
+      });
     }
     //stores the hash function into res.locals
-    console.log(hash);
-    //console.log(hash);
+    console.log('bcrypt hash: ', hash);
     res.locals.bcrypt = hash;
     //returns next() that will pass the hashed password to the next middleware function
     return next();
@@ -30,7 +36,6 @@ databaseController.bcrypt = (req, res, next) => {
 };
 
 databaseController.verifyAccount = (req, res, next) => {
-  // write code here
   // const { username, password } = req.body;
   const values = [req.body.username];
   let queryString = "SELECT password FROM account WHERE username = $1;";
@@ -71,12 +76,13 @@ databaseController.getAccountID = (req, res, next) => {
 
 databaseController.getItinerary = (req, res, next) => {
 
-  // This doesn't work: 'databaseController.addAccount : ERROR: error: insert or update on table "itinerary" violates foreign key constraint "hotel_fk"'
+  
 
   const accountID = [req.cookies.accountID]; //Account ID is obtained from a cookie.
   // const accountID = [res.locals.accountID];
   // let queryString = 'SELECT i.*, c.name AS country_name, c.currency_code AS currency_code, f.name AS flight_name, f.price AS flight_price, h.name AS hotel_name, h.price AS hotel_price, y.name AS activity_name, y.price AS activity_price FROM itinerary i LEFT OUTER JOIN country c on i.country_id = c._id LEFT OUTER JOIN flight f on i.flight_id = f._id LEFT OUTER JOIN hotel h on i.hotel_id = h._id LEFT OUTER JOIN itinerary_activity x on i._id = x.itinerary_id LEFT OUTER JOIN activity y ON x.activity_id = y._id WHERE account_id = $1;' 
   let queryString = 'SELECT i.*, c.name AS country_name, c.currency_code AS currency_code, f.name AS flight_name, f.price AS flight_price, h.name AS hotel_name, h.price AS hotel_price, u.name AS name, u.currency AS user_currency FROM itinerary i LEFT OUTER JOIN country c on i.country_id = c._id LEFT OUTER JOIN flight f on i.flight_id = f._id LEFT OUTER JOIN hotel h on i.hotel_id = h._id LEFT OUTER JOIN account u ON i.account_id = u._id WHERE account_id = $1;' 
+  
   query(queryString, accountID)
       .then(data => {
         //console.log(data.rows);
@@ -127,6 +133,8 @@ databaseController.createItineraryActivity = (req, res, next) => {
 };
 
 databaseController.addAccount = (req, res, next) => {
+
+  
   // write code here
   // const { username, password } = req.body;
   console.log(req.body);
@@ -138,75 +146,107 @@ databaseController.addAccount = (req, res, next) => {
     req.body.currency,
   ];
   let queryString =
-    "INSERT INTO account(name, username, password, currency) VALUES($1, $2, $3, $4) RETURNING _id;";
-
+    "INSERT INTO account (name, username, password, currency) VALUES($1, $2, $3, $4) RETURNING _id;";
+    
   query(queryString, values)
-    .then((data) => {
-      // //console.log(
+  .then((data) => {
+    // //console.log(
       //   "data inside addAccount middleware",
       //   //console.log(data.rows[0]._id)
       // );
       return next();
     })
     .catch((err) =>
-      res.render("./../client/signup", {
-        error: `databaseController.addAccount : ERROR: ${err}`,
-        message: { err: "error occurred in databaseController.addAccount" },
-      })
-    );
-};
-
-databaseController.deleteAccount = (req, res, next) => {};
-
-databaseController.addItinerary = async (req, res, next) => {
-  console.log('this is request', req.body)
-  const itineraryValues = [
-    [req.body.countryName, req.body.countryCode], //country
-    [req.body.hotelName, req.body.hotelPrice], //hotel
-    [req.body.flightName, req.body.flightPrice], //flight
-  ];
-
-  const queryStrings = [
-    "INSERT INTO country(name, currency_code) VALUES($1, $2) RETURNING _id;", //country
-    "INSERT INTO hotel(name, price) VALUES($1, $2) RETURNING _id;", //hotel
-    "INSERT INTO flight(name, price) VALUES($1, $2) RETURNING _id;", //flight
-  ];
-
-  let foreignKeys = [];
-
-  //below creates country, hotel, flight, activity & save their primary key in foreignKeys array
-  for (let i = 0; i < queryStrings.length; i++) {
-    await query(queryStrings[i], itineraryValues[i])
-      .then((data) => {
-        foreignKeys.push(data.rows[0]._id);
-      })
-      .catch((err) =>
-        res.render("./../client/signup", {
-          error: `databaseController.addAccount : ERROR: ${err}`,
-          message: { err: "error occurred in databaseController.addAccount" },
-        })
-      );
-  }
-
-  foreignKeys = [...foreignKeys, req.cookies.accountID];
-  
-  console.log("CHECK ->>>>>>>>>>>>>>>>>", foreignKeys);
-  // below creates itinerary with given foreign keys
-  const itineraryQueryStrings =
-    "INSERT INTO itinerary(country_id, flight_id, hotel_id, account_id) VALUES($1, $2, $3, $4)";
-
-  await query(itineraryQueryStrings, foreignKeys)
-    .then((data) => {
-      console.log('inside query')
-      return next();
+    res.render("./../client/signup", {
+      error: `databaseController.addAccount : ERROR: ${err}`,
+      message: { err: "error occurred in databaseController.addAccount" },
     })
-    .catch((err) =>
-      res.render("./../client/signup", {
-        error: `databaseController.addAccount : ERROR: ${err}`,
-        message: { err: "error occurred in databaseController.addAccount" },
-        message: { err: 'error occurred in databaseController.addAccount'}
-      }))
-};
+    );
+  };
+  
+  databaseController.deleteAccount = (req, res, next) => {};
+  
+  databaseController.addItineraryCountry = (req, res, next) => {
+    console.log('request body: ', req.body);
+    const parameters = [req.body.countryName, req.body.countryCode];
+    console.log(parameters[0]);
+    console.log(parameters[1]);
+    
+    // const query = 'INSERT INTO country (name, currency_code) VALUES($1, $2) RETURNING _id' //country RETURNING _id
+    const text = "INSERT INTO country (name, currency_code) VALUES ($1, $2) RETURNING _id;"
+    query(text, parameters)
+      .then((data) => {
+        // console.log('Itinerary Country DB response: ', data.rows);
+        // save id in res.locals
+        res.locals.countryId = data.rows[0]._id;
+        console.log(res.locals.countryId);
+        return next();
+      })
+      .catch((err) => {
+        return next({
+          log: `databaseController.addItineraryCountry: ERROR ${err}`,
+          message: 'Error occurred in databaseController.addItineraryCountry. Check server log for more details',
+        });
+      })
+  };
+
+  databaseController.addItineraryHotel = (req, res, next) => {
+    const parameters = [req.body.hotelName ,req.body.hotelPrice];
+    const text = "INSERT INTO hotel(name, price) VALUES($1, $2) RETURNING _id;" 
+    query(text, parameters) 
+      .then((data) => {
+        res.locals.hotelId = data.rows[0]._id;
+        console.log(res.locals.hotelId)
+        return next()
+      })
+      .catch((err) => {
+        return next({
+          log: `databaseController.addItineraryHotel: ERROR ${err}`,
+          message: 'Error occurred in databaseController.addItineraryHotel. Check server log for more details',
+        })
+      })
+  }
+  
+
+
+  databaseController.addItineraryFlight = (req, res, next) => {
+    
+    const parameters = [req.body.flightName, req.body.flightPrice];
+    const text = "INSERT INTO flight(name, price) VALUES($1, $2) RETURNING _id;" 
+    
+    query(text, parameters)
+      .then((data) => {
+        console.log('addItineraryFlight: ', data);
+        res.locals.flightId = data.rows[0]._id;
+        console.log(res.locals.flightId);
+        return next();
+      })
+      .catch((err) => {
+        return next({
+          log: `databaseController.addItineraryFlight: ERROR ${err}`,
+          message: 'Error occurred in databaseController.addItineraryFlight. Check server log for more details',
+        });
+      })
+  }
+  
+  databaseController.addItinerary = (req, res, next) => {
+
+    const { flightId, hotelId, countryId } = res.locals;
+    const { accountID } = req.cookies;
+    const parameters = [countryId, flightId, hotelId, accountID];
+    const text = "INSERT INTO itinerary(country_id, flight_id, hotel_id, account_id) VALUES($1, $2, $3, $4)";
+    console.log({flightId, hotelId, countryId, accountID});
+    query(text, parameters)
+      .then((data) => {
+        return next();
+      })
+      .catch((err) => {
+        return next({
+         log: `databaseController.addItineraryFlight: ERROR ${err}`,
+         message: 'Error occurred in databaseController.addItineraryFlight. Check server log for more details',
+        });
+      })
+  }
   
   databaseController.deleteAccount = (req, res, next) => {
     // write code here

@@ -8,25 +8,28 @@
  *
  * ************************************
  */
-
 /******************** Importing modules ************************/
 // Importing path and express node modules
 const path = require('path');             // https://nodejs.org/api/path.html
 const express = require('express');       // https://www.npmjs.com/package/express
+
+//Requiring in dependency cookie-parser to parse cookies in file      
+const cookieParser = require('cookie-parser'); // https://www.npmjs.com/package/cookie-parser
 
 // Declaring app, assigning app to instance of express to run express methods upon
 const app = express();
 // Declaring port variable for listen use case 
 const PORT = 3000;
 
-//Importing object w/ methods exported from databaseControllers file, giving it label of cookieController  
-const databaseController = require('./controllers/databaseControllers');
+// Import routers
+const homepageRouter = require(path.resolve(__dirname, './routers/homepageRouter.js'));
+const signupRouter = require(path.resolve(__dirname, './routers/signupRouter.js'));
 
-//Requiring in dependency cookie-parser to parse cookies in file      
-const cookieParser = require('cookie-parser'); // https://www.npmjs.com/package/cookie-parser
+//Importing object w/ methods exported from databaseControllers file, giving it label of cookieController  
+const databaseController = require(path.resolve(__dirname, './controllers/databaseControllers'));
 
 //Importing object w/ methods exported from cookieController file, giving it label of cookieController  
-const cookieController = require('./controllers/cookieController');
+const cookieController = require(path.resolve(__dirname, './controllers/cookieController'));
 
 /******************** Express Middleware ************************/
 
@@ -58,64 +61,25 @@ app.get('/', (req, res) => {
 
 // TO DO: Create two routers, homepageRouter and signupRouter to handle any requests to /homepage and /signup to their respective routers.
 
-// Handle requests to '/homepage/itinerary' and render index? to page; specify endpoint; appending to add ejs 
-app.post('/homepage/itinerary', databaseController.addItinerary, (req, res) => {
-  console.log('INSIDE HOMEPAGE/ITINERARY');
-  console.log(path.resolve(__dirname, '../index.ejs'));
-  return res.status(200).render(path.resolve(__dirname, '../index.ejs'));
-});
+// Send to homepage router for http requests to the /homepage/ path
+app.use('/homepage', homepageRouter);
 
-app.get('/homepage/getItinerary', databaseController.getItinerary, (req, res) => {
-  return res.status(200).json(res.locals.itinerary);
-});
+// Send to signup router for http requests to the /signup/ path
+app.use('/signup', signupRouter);
 
-//when user (get) requests signup page, then render signup page
-app.get('/signup', (req, res) => {
-  res.render('./../client/signup', {error: null});
-});
-
-app.post('/signup', 
-  databaseController.bcrypt, 
-  databaseController.addAccount, 
+// Handle requests to '/login', verify the username/password, if successful, get the account id and store it in response.cookies, then render the index page to client
+app.post('/login', 
+  databaseController.verifyAccount, 
   databaseController.getAccountID, 
   cookieController.setCookie, 
   (req, res) => {
-  // when user successfully signs up, need to save account, then redirect them to home page
-  return res.status(200).render('../index');
+  // user attempts to login, verify info is accurate, then redirect to user's home page
+  // return res.locals.passwords
+  return res.render('../index');
 });
 
-
-// app.get('/homepage', (req, res) => {
-  //   return res.render('../index')
-  // })
-  
-  //test
-  // app.get('/db/getName', (req, res) => {
-    //   console.log('req', req);
-    //   res.json('Peter');
-    // })
-    
-    
-    //user posts request on signup page, create user and return 'home' page
-    
-    
-    //THIS WAS FOR TESTING, user creates itinerary here
-    
-    app.post('/login', 
-      databaseController.verifyAccount, 
-      databaseController.getAccountID, 
-      cookieController.setCookie, 
-      (req, res) => {
-      // user attempts to login, verify info is accurate, then redirect to user's home page
-      // return res.locals.passwords
-      return res.render('../index');
-    });
-// app.get('/index', (req, res) => {
-//   return res.status(200).render('../index')
-// })
-
-
-app.use('/db/getactivities', databaseController.getActivities, (req, res) => {
+// Handle requests to '/db/getactivities', pull activities for specific user and send back to client
+app.use('/db/getactivities', databaseController.getActivities, (req, res) => { // Why db/getactivities and not just getactivities?
   return res.status(200).json(res.locals.activities);
 });
 
@@ -128,9 +92,17 @@ app.post('/addactivity', databaseController.addActivity, databaseController.crea
 
 //global error handler
 app.use((err, req, res, next) => {
-  return res.status(500).send('This is our global error handler message. Yay!');
+  const defaultErr = {
+    log: 'Express error handler caught unknown middleware error',
+    status: 500,
+    message: { err: 'An error occurred' },
+  };
+  const errorObj = Object.assign({}, defaultErr, err);
+  console.log(errorObj.log);
+  return res.status(errorObj.status).json(errorObj.message);
 });
 
+// Port listening, console logs to VS Code terminal when port 3000 is on 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 })
