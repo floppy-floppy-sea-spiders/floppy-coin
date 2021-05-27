@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.root {
+  --main-gray: rgb(152, 152, 152);
+  --main-black: rgb(0, 0, 0);
+  --main-green-sheen: rgb(121, 188, 171);
+  --sea-green: rgb(40, 163, 181);
+  --medium-electric-blue: rgb(13, 94, 152);
+};
+
+
+.trip {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+}
+
+.tripContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* colors */
+
+.nav {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 45px;
+  top: 0;
+  z-index: 999;
+  background: var(--main-black);
+  /*to counter blending with black for now */
+  }
+
+/* main */
+
+body {
+  background: var(--main-gray);
+  margin: 0;
+  height: 100%;
+  max-width: 100%;
+  overflow-y: hidden;
+}
+/* 
+Hey, I'm about to pull some css in. give me a few.
+Thanks!
+no worries
+feel free to overwrite anything 
+*/
+
+/*
+to html
+<nav id="navbar" class="nav">
+  </nav>
+<link
+    href="https://fonts.googleapis.com/css2?family=Economica:wght@400;700&family=Lexend+Deca&family=Staatliches&family=Unica+One&display=swap"
+    rel="stylesheet">
+
+
+    <div class="text-container">
+        <div class="singlesource">
+          <h1 class="care">
+          we're here to lend a tentacle(?) <--lame
+          </h1>
+          <h1 class="Octopus">
+          Your Traveling Octopus
+          </h1>
+    </footer>
+  <nav id="footer" class="bar">
+    </footer>
+*/

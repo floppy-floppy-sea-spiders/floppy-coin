@@ -1,82 +1,83 @@
-const path = require('path');
-const express = require('express');
-const app = express();
-const PORT = 3000;
-const databaseController = require('./controllers/databaseControllers');
-const cookieParser = require('cookie-parser');
-const cookieController = require('./controllers/cookieController');
+/**
+ * ************************************
+ *
+ * @module Server
+ * @author Scratch: Team Photogenicus (Phillip, Sean, Peter, Alex and Brian), Iteration: Team Floppy (Sully, Robleh, Ken, Angela, Lorenzo)
+ * @date 5/25/2021
+ * @description Main server file
+ *
+ * ************************************
+ */
+/******************** Importing modules ************************/
+// Importing path and express node modules
+const path = require('path');             // https://nodejs.org/api/path.html
+const express = require('express');       // https://www.npmjs.com/package/express
 
-app.use(express.urlencoded({ extended: true }));
+//Requiring in dependency cookie-parser to parse cookies in file      
+const cookieParser = require('cookie-parser'); // https://www.npmjs.com/package/cookie-parser
+
+// Declaring app, assigning app to instance of express to run express methods upon
+const app = express();
+// Declaring port variable for listen use case 
+const PORT = 3000;
+
+// Import routers
+const homepageRouter = require(path.resolve(__dirname, './routers/homepageRouter.js'));
+const signupRouter = require(path.resolve(__dirname, './routers/signupRouter.js'));
+
+//Importing object w/ methods exported from databaseControllers file, giving it label of cookieController  
+const databaseController = require(path.resolve(__dirname, './controllers/databaseControllers'));
+
+//Importing object w/ methods exported from cookieController file, giving it label of cookieController  
+const cookieController = require(path.resolve(__dirname, './controllers/cookieController'));
+
+/******************** Express Middleware ************************/
+
+// app.use without a path specified applies the middleware to all requests
+
+// Parses incoming requests with urlencoded payloads http://expressjs.com/en/api.html#express.urlencoded
+app.use(express.urlencoded({ extended: true })); 
 
 app.use(express.static(path.join(__dirname, '../build')));
 app.use(express.static('public')); //potentially unecessary
 
+//built-in middleware function in Express: parses incoming requests with JSON payloads; places in req.body 
 app.use(express.json());
+
+//Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 app.use(cookieParser());
-//use for rendering ejs templates, ejs must be rendered.
-app.set('view engine', 'ejs');
 
+// Express JavaScript Templates (EJs)
+// Used for rendering Express JavaScript templates, EJs must be rendered.
+app.set('view engine', 'ejs'); // http://expressjs.com/en/api.html#app.set
 
+/******************** Server Route Handlers ************************/
+
+// Handle requests to '/' and render login screen back to client
 app.get('/', (req, res) => {
-  //change return filepath to login screen
-  return res.render('../client/login');
-});
+  return res.render(path.resolve(__dirname, '../client/login'));
+}); 
 
-app.post('/homepage/itinerary', databaseController.addItinerary, (req, res) => {
-  console.log('We ARE HERE!')
-  return res.status(200).render('../index');
-})
 
-app.get('/homepage/getItinerary', databaseController.getItinerary, (req, res) => {
-  return res.status(200).json(res.locals.itinerary);
-});
-//when user (get) requests signup page, then render signup page
-app.get('/signup', (req, res) => {
-  res.render('./../client/signup', {error: null});
-});
+// Send to homepage router for http requests to the /homepage/ path
+app.use('/homepage', homepageRouter);
 
-app.post('/signup', 
-  databaseController.bcrypt, 
-  databaseController.addAccount, 
+// Send to signup router for http requests to the /signup/ path
+app.use('/signup', signupRouter);
+
+// Handle requests to '/login', verify the username/password, if successful, get the account id and store it in response.cookies, then render the index page to client
+app.post('/login', 
+  databaseController.verifyAccount, 
   databaseController.getAccountID, 
   cookieController.setCookie, 
   (req, res) => {
-  // when user successfully signs up, need to save account, then redirect them to home page
-  return res.status(200).render('../index');
+  // user attempts to login, verify info is accurate, then redirect to user's home page
+  // return res.locals.passwords
+  return res.render('../index');
 });
 
-
-// app.get('/homepage', (req, res) => {
-  //   return res.render('../index')
-  // })
-  
-  //test
-  // app.get('/db/getName', (req, res) => {
-    //   console.log('req', req);
-    //   res.json('Peter');
-    // })
-    
-    
-    //user posts request on signup page, create user and return 'home' page
-    
-    
-    //THIS WAS FOR TESTING, user creates itinerary here
-    
-    app.post('/login', 
-      databaseController.verifyAccount, 
-      databaseController.getAccountID, 
-      cookieController.setCookie, 
-      (req, res) => {
-      // user attempts to login, verify info is accurate, then redirect to user's home page
-      // return res.locals.passwords
-      return res.render('../index');
-    });
-// app.get('/index', (req, res) => {
-//   return res.status(200).render('../index')
-// })
-
-
-app.use('/db/getactivities', databaseController.getActivities, (req, res) => {
+// Handle requests to '/db/getactivities', pull activities for specific user and send back to client
+app.use('/db/getactivities', databaseController.getActivities, (req, res) => { // Why db/getactivities and not just getactivities?
   return res.status(200).json(res.locals.activities);
 });
 
@@ -87,11 +88,19 @@ app.post('/addactivity', databaseController.addActivity, databaseController.crea
   return res.status(200).send('Brian, please fix this return statement');
 });
 
-//global error handler
+// global error handler
 app.use((err, req, res, next) => {
-  return res.status(500).send('This is our global error handler message. Yay!');
+  const defaultErr = {
+    log: 'Express error handler caught unknown middleware error',
+    status: 500,
+    message: { err: 'An error occurred' },
+  };
+  const errorObj = Object.assign({}, defaultErr, err);
+  console.log(errorObj.log);
+  return res.status(errorObj.status).json(errorObj.message);
 });
 
+// Port listening, console logs to VS Code terminal when port 3000 is on 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 })
