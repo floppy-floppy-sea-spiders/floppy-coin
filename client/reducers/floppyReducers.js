@@ -9,57 +9,53 @@
  * ************************************
  */
 
- //import * as types from './actions/actions.js';
+// import * as types from './actions/actions.js';
 
- const initialState = {
-     id: '',
-     country: '',
-     username: '',
-     hotel: '',
-     currencyType: "",
-    //  conversion_Currency : '',
-     exchangeRate: [],
-     itineraries: []
- }
+const initialState = {
+  id: '',
+  country: '',
+  username: '',
+  hotel: '',
+  currencyType: '',
+  //  conversion_Currency : '',
+  exchangeRate: [],
+  itineraries: [],
+};
 
-
-const octopusReducers = (state = initialState, action) => {
-
+const floppyReducers = (state = initialState, action) => {
   switch (action.type) {
     case 'UPDATE_USER': {
       let newUsername = state.username;
-      let newId = state.id; 
-      let newItineraries = [];
-      let newCurrency = action.payload[0].user_currency;
+      let newId = state.id;
+      const newItineraries = [];
+      const newCurrency = action.payload[0].user_currency;
 
       const allItineraries = action.payload;
-      
+
       newUsername = action.payload[0].name;
-      newId = action.payload[0].account_id; 
+      newId = action.payload[0].account_id;
 
       for (let i = 0; i < allItineraries.length; i++) {
         newItineraries.push(allItineraries[i]);
       }
-      
 
       return {
         ...state,
         id: newId,
         username: newUsername,
-        currencyType : newCurrency,
+        currencyType: newCurrency,
         itineraries: newItineraries,
-        
-      }
+      };
     }
     case 'UPDATE_CURRENCY': {
-      let newExchangeRate = action.payload.conversion_rates;
+      const newExchangeRate = action.payload.conversion_rates;
       return {
         ...state,
         exchangeRate: newExchangeRate,
-      }
+      };
     }
     default:
       return state;
   }
-}
-   export default octopusReducers;
+};
+export default floppyReducers;
