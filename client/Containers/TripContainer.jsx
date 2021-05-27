@@ -6,7 +6,7 @@ import FlightComponent from '../components/FlightComponent.jsx';
 import HotelComponent from '../components/HotelComponent.jsx';
 import ActivityComponent from '../components/ActivityComponent.jsx';
 import Trip from '../components/Trip.jsx';
-import Styles from '../../styles.css'
+import Styles from '/public/styles.css';
 
 
 function TripContainer() {
@@ -31,7 +31,7 @@ function TripContainer() {
   }
 
   return (
-
+    // opporutniy to clean up
     <div className={Styles.tripContainer}>
       {trips}
       {/* <CountryComponent />

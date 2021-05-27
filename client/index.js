@@ -1,3 +1,5 @@
+// hanging the App up in the 'root' element in index.html and wrapping the store in Provider
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 //import { render } from 'react-dom';
