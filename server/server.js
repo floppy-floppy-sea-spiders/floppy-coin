@@ -38,7 +38,12 @@ const cookieController = require(path.resolve(__dirname, './controllers/cookieCo
 // Parses incoming requests with urlencoded payloads http://expressjs.com/en/api.html#express.urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.resolve(__dirname, '../build')));
+// Only serve minified and uglified code if environment is production
+if (process.env.NODE_ENV === 'production') {
+  app.use('/build', express.static(path.resolve(__dirname, '../build')));
+}
+
+// Serve static files in the public folder (styles.css)
 app.use(express.static(path.resolve(__dirname, '../public'))); // potentially unecessary
 
 // built-in middleware function in Express: parses incoming requests with JSON payloads; places in req.body
