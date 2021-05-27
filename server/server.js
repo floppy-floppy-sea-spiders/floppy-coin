@@ -4,7 +4,7 @@
  * @module Server
  * @author Scratch: Team Photogenicus (Phillip, Sean, Peter, Alex and Brian), Iteration: Team Floppy (Sully, Robleh, Ken, Angela, Lorenzo)
  * @date 5/25/2021
- * @description 
+ * @description Main server file
  *
  * ************************************
  */
@@ -59,7 +59,6 @@ app.get('/', (req, res) => {
   return res.render(path.resolve(__dirname, '../client/login'));
 }); 
 
-// TO DO: Create two routers, homepageRouter and signupRouter to handle any requests to /homepage and /signup to their respective routers.
 
 // Send to homepage router for http requests to the /homepage/ path
 app.use('/homepage', homepageRouter);
@@ -90,7 +89,7 @@ app.post('/addactivity', databaseController.addActivity, databaseController.crea
   return res.status(200).send('Brian, please fix this return statement');
 });
 
-//global error handler
+// global error handler
 app.use((err, req, res, next) => {
   const defaultErr = {
     log: 'Express error handler caught unknown middleware error',

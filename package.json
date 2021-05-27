@@ -1,5 +1,5 @@
 {
-  "name": "FloppyCoin",
+  "name": "travelingOctopus",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/floppy-floppy-sea-spiders/floppy-coin.git"
+    "url": "git+https://github.com/sturgeonphillip/travelingOctopus.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/floppy-floppy-sea-spiders/floppy-coin/issues"
+    "url": "https://github.com/sturgeonphillip/travelingOctopus/issues"
   },
-  "homepage": "https://github.com/floppy-floppy-sea-spiders/floppy-coin",
+  "homepage": "https://github.com/sturgeonphillip/travelingOctopus#readme",
   "devDependencies": {
     "@babel/core": "^7.14.3",
     "@babel/preset-env": "^7.14.2",
@@ -33,6 +33,7 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "css-loader": "^5.2.6",
@@ -49,3 +50,4 @@
     "style-loader": "^2.0.0"
   }
 }
+ 

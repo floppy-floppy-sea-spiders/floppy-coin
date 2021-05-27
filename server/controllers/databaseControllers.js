@@ -332,28 +332,4 @@ databaseController.deleteItinerary = (req, res, next) => {
   });
 };
 
-// databaseController.deleteItinerary = (req, res, next) => {
-//   // write code here
-//   const id = req.body;
-//   // console.log(id_name, 'us');
-//   console.log(id.name, 'dot');
-//   const values = Object.values(id);
-//   console.log(values)
-//   // name, gender, species, species_id, birth_year, eye_color, skin_color, hair_color, mass, height,
-//   //homeworld, homeworld_id, films
-//   //id.name, id.gender, id.species, id.species_id, id.birth_year, id.eye_color, id.skin_color, id.hair_color, id.mass, id.height, id.homeworld, id.homeworld_id, id.films
-//   // console.log(req.body);
-//   const newChar = 'INSERT INTO people (name, gender, species, species_id, birth_year, eye_color, skin_color, hair_color, mass, height, homeworld, homeworld_id, films) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);';
-//   db.query(newChar, id)
-//     .then(results => {
-//       res.locals.characters.length = results;
-//       next();
-//     })
-//     .catch(() => {
-//       next({
-//         log: 'starWarsController.js: Error adding character'
-//       });
-//     });
-// };
-
 module.exports = databaseController;

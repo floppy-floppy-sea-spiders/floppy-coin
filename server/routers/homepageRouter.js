@@ -19,9 +19,14 @@ const databaseController = require(path.resolve(__dirname, '../controllers/datab
 const router = express.Router(); 
 
 
-router.post('/itinerary', databaseController.addItineraryCountry, databaseController.addItineraryHotel, databaseController.addItineraryFlight, databaseController.addItinerary ,(req, res) => {
-  console.log('RES LOCALS: ', res.locals);
-  return res.status(200).render(path.resolve(__dirname, '../../index.ejs'));
+router.post('/itinerary', 
+  databaseController.addItineraryCountry, 
+  databaseController.addItineraryHotel, 
+  databaseController.addItineraryFlight, 
+  databaseController.addItinerary,
+  (req, res) => {
+    console.log('RES LOCALS: ', res.locals);
+    return res.status(200).render(path.resolve(__dirname, '../../index.ejs'));
 });
 
 // Handle requests to 'homepage/getItinerary', invoke getItinerary method on databaseController - returned itinerary JS object will be sent back to client after being converted back to JSON, along with 200 status
