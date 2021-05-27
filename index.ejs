@@ -1,4 +1,4 @@
-
+<!-- Leverage embedded javascript to allow for dynamic rendering when data are coming from multiple sources -->
 <!DOCTYPE html>
 <html>
 
@@ -9,13 +9,14 @@
   <meta name="Traveling Octopus" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <base href="/" >
-  <link rel="stylesheet" href="/styles.css" >
+  <link rel="stylesheet" type="text/css" href="styles.css" >
 </head>
 
 <body>
   <div id="root">
 
   </div>
+  <!-- include async and defer to speed up rendering by enabling the browser to perform fetch requests and rendering HTML in parallel  -->
   <script src="/build/bundle.js" async defer></script>
 </body>
 

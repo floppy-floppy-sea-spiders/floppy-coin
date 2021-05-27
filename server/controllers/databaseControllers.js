@@ -76,7 +76,7 @@ databaseController.getItinerary = (req, res, next) => {
   let queryString = 'SELECT i.*, c.name AS country_name, c.currency_code AS currency_code, f.name AS flight_name, f.price AS flight_price, h.name AS hotel_name, h.price AS hotel_price, u.name AS name, u.currency AS user_currency FROM itinerary i LEFT OUTER JOIN country c on i.country_id = c._id LEFT OUTER JOIN flight f on i.flight_id = f._id LEFT OUTER JOIN hotel h on i.hotel_id = h._id LEFT OUTER JOIN account u ON i.account_id = u._id WHERE account_id = $1;' 
   query(queryString, accountID)
       .then(data => {
-        //console.log(data.rows);
+        console.log(data.rows);
         res.locals.itinerary = data.rows;
         return next();
       })

@@ -9,7 +9,7 @@ const cookieController = require('./controllers/cookieController');
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, '../build')));
-app.use(express.static(__dirname + '/public'));
+app.use(express.static('public')); //potentially unecessary
 
 app.use(express.json());
 app.use(cookieParser());

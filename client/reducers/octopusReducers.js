@@ -36,8 +36,6 @@ const octopusReducers = (state = initialState, action) => {
       
       newUsername = action.payload[0].name;
       newId = action.payload[0].account_id; 
-      
-      
 
       for (let i = 0; i < allItineraries.length; i++) {
         newItineraries.push(allItineraries[i]);
