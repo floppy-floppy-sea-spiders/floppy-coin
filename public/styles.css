@@ -34,37 +34,9 @@
 /* main */
 
 body {
-  background: var(--main-gray);
+  background-color: #d1f3e0;
   margin: 0;
   height: 100%;
   max-width: 100%;
   overflow-y: hidden;
 }
-/* 
-Hey, I'm about to pull some css in. give me a few.
-Thanks!
-no worries
-feel free to overwrite anything 
-*/
-
-/*
-to html
-<nav id="navbar" class="nav">
-  </nav>
-<link
-    href="https://fonts.googleapis.com/css2?family=Economica:wght@400;700&family=Lexend+Deca&family=Staatliches&family=Unica+One&display=swap"
-    rel="stylesheet">
-
-
-    <div class="text-container">
-        <div class="singlesource">
-          <h1 class="care">
-          we're here to lend a tentacle(?) <--lame
-          </h1>
-          <h1 class="Octopus">
-          Your Traveling Octopus
-          </h1>
-    </footer>
-  <nav id="footer" class="bar">
-    </footer>
-*/
